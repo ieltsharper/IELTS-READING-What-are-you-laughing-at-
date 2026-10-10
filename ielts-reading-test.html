@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IELTS Academic Reading – Passage 1</title>
+<style>
+  :root {
+    --navy: #1f3a68;
+    --navy-dark: #152a4d;
+    --navy-tint: #e9eef7;
+    --text: #2b2b2b;
+    --muted: #6b6f76;
+    --line: #d9dde3;
+    --bg-soft: #f6f7f9;
+    --ok: #1b7f3b;
+    --ok-tint: #e6f4ea;
+    --bad: #c62828;
+    --bad-tint: #fdecea;
+    --hl: #fff176;
+    --serif: Georgia, "Times New Roman", Times, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --hdr: 52px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #fff; color: var(--text); font-family: var(--sans);
+    display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden;
+  }
+  button { font: inherit; }
+  .sr {
+    position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  :focus-visible { outline: 3px solid #f2a900; outline-offset: 2px; }
+
+  /* ---------- Top bar ---------- */
+  header.topbar {
+    flex: none; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 8px 16px; background: var(--navy); color: #fff; min-height: var(--hdr);
+    z-index: 20;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 600; margin: 0; flex: 1 1 auto; letter-spacing: .2px; }
+  .timer { display: flex; align-items: center; gap: 8px; }
+  .timer-display {
+    font-variant-numeric: tabular-nums; font-weight: 700; font-size: 17px;
+    background: rgba(255,255,255,.12); padding: 3px 10px; border-radius: 4px; min-width: 66px; text-align: center;
+  }
+  .timer-display.low { background: var(--bad); color: #fff; }
+  .counter { font-size: 14px; white-space: nowrap; }
+  .btn {
+    border: 1px solid rgba(255,255,255,.7); background: transparent; color: #fff;
+    padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 14px;
+  }
+  .btn:hover { background: rgba(255,255,255,.12); }
+  .btn.solid { background: #fff; color: var(--navy); border-color: #fff; font-weight: 600; }
+  .btn.solid:hover { background: var(--navy-tint); }
+  .btn:disabled { opacity: .5; cursor: default; }
+
+  /* ---------- Split layout ---------- */
+  main.split { flex: 1 1 auto; min-height: 0; display: flex; }
+  .panel { min-width: 0; height: 100%; }
+  #passagePanel { flex: 0 0 50%; overflow-y: auto; padding: 24px 28px 48px; }
+  #questionsPanel { flex: 1 1 0; display: flex; flex-direction: column; border-left: 1px solid var(--line); }
+  .divider {
+    flex: 0 0 8px; cursor: col-resize; background: var(--bg-soft); position: relative;
+    border-left: 1px solid var(--line); touch-action: none;
+  }
+  .divider::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 2px; height: 36px;
+    transform: translate(-50%,-50%); border-left: 2px dotted #9aa3b0;
+  }
+  .divider:hover, .divider.dragging { background: var(--navy-tint); }
+  body.resizing { cursor: col-resize; user-select: none; }
+
+  /* ---------- Passage ---------- */
+  .passage { max-width: 70ch; margin: 0 auto; font-family: var(--serif); font-size: 17px; line-height: 1.7; }
+  .passage h2 { font-family: var(--sans); font-size: 18px; color: var(--navy); margin: 0 0 6px; letter-spacing: .3px; }
+  .passage .instr { font-family: var(--sans); font-size: 14px; color: var(--muted); margin: 0 0 22px; line-height: 1.5; }
+  .passage .title { text-align: center; font-size: 22px; margin: 4px 0 20px; font-weight: 700; }
+  .passage p.para { margin: 0 0 1.1em; border-radius: 4px; transition: background-color .4s; padding: 2px 4px; margin-left: -4px; margin-right: -4px; }
+  .plabel { font-family: var(--sans); font-weight: 700; color: var(--navy); margin-right: .45em; }
+  .missing { font-family: var(--sans); font-size: 13px; color: var(--muted); background: var(--bg-soft); border: 1px dashed #b9c0ca; border-radius: 3px; padding: 0 4px; }
+  mark.hl { background: var(--hl); color: inherit; cursor: pointer; border-radius: 2px; }
+  mark.hl:hover { background: #ffe94d; box-shadow: 0 0 0 1px #e0c200; }
+  p.para.flash { animation: flash 2.4s ease; }
+  @keyframes flash { 0%,60% { background: #dce7fb; box-shadow: 0 0 0 3px #dce7fb; } 100% { background: transparent; box-shadow: none; } }
+  .hl-pop {
+    position: fixed; z-index: 50; display: none; background: var(--navy); color: #fff; border: 0;
+    padding: 5px 10px; border-radius: 4px; font: 600 13px var(--sans); cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  .hl-pop::before { content: ""; display: inline-block; width: 10px; height: 10px; background: var(--hl); border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+  /* ---------- Questions ---------- */
+  .q-scroll { flex: 1 1 auto; overflow-y: auto; padding: 20px 24px 32px; font-size: 15px; line-height: 1.5; }
+  .score {
+    display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: var(--navy-tint); border: 1px solid #c8d4ea; border-radius: 6px; padding: 12px 16px; margin-bottom: 18px;
+  }
+  .score.show { display: flex; }
+  .score strong { font-size: 20px; color: var(--navy); }
+  .btn-navy { background: var(--navy); color: #fff; border: 0; border-radius: 4px; padding: 7px 14px; cursor: pointer; font-weight: 600; }
+  .btn-navy:hover { background: var(--navy-dark); }
+  section.qgroup { margin-bottom: 34px; }
+  .qgroup > h3 { font-size: 17px; margin: 0 0 10px; color: var(--navy); }
+  .instr-box { background: var(--bg-soft); border-left: 4px solid var(--navy); padding: 10px 14px; margin-bottom: 14px; border-radius: 0 4px 4px 0; }
+  .instr-box p { margin: 0 0 6px; } .instr-box p:last-child { margin-bottom: 0; }
+  .instr-box dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; margin: 6px 0 0; }
+  .instr-box dt { font-weight: 700; } .instr-box dd { margin: 0; }
+
+  .people {
+    position: sticky; top: -20px; z-index: 5; background: #fff; border: 1px solid var(--line);
+    border-radius: 6px; padding: 8px 12px; margin: 0 0 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  }
+  .people h4 { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+  .people ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 2px 16px; font-size: 14px; }
+  .people b { color: var(--navy); display: inline-block; width: 1.3em; }
+
+  .q { padding: 10px 0; border-bottom: 1px solid #eef0f3; scroll-margin-top: 90px; }
+  .q:focus { outline: none; }
+  .q.target { animation: qflash 1.6s ease; }
+  @keyframes qflash { 0%,50% { background: var(--navy-tint); } 100% { background: transparent; } }
+  .q-row { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+  .q-text { margin: 0; flex: 1 1 220px; }
+  .qn { display: inline-block; min-width: 24px; font-weight: 700; color: var(--navy); }
+  .opts { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; border: 0; margin: 0; padding: 0; }
+  .opts legend { padding: 0; }
+  .letter + label, .letter-lbl {
+    display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+    border: 1.5px solid var(--navy); border-radius: 4px; color: var(--navy); font-weight: 700; cursor: pointer;
+    user-select: none; background: #fff; font-size: 14px;
+  }
+  .opts input:checked + label { background: var(--navy); color: #fff; }
+  .opts input:focus-visible + label { outline: 3px solid #f2a900; outline-offset: 2px; }
+  .opts input:disabled + label { cursor: default; }
+  .opts label:hover { background: var(--navy-tint); }
+  .opts input:checked + label:hover { background: var(--navy-dark); }
+  .chosen { font-size: 12px; color: var(--muted); min-width: 96px; }
+  .pill {
+    display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 1.5px solid var(--navy);
+    border-radius: 999px; color: var(--navy); font-weight: 600; font-size: 13px; cursor: pointer; user-select: none; background: #fff;
+  }
+  label.ok, .opts input:checked + label.ok { background: var(--ok) !important; border-color: var(--ok) !important; color: #fff !important; }
+  label.bad, .opts input:checked + label.bad { background: var(--bad) !important; border-color: var(--bad) !important; color: #fff !important; }
+  label.key { border: 2px dashed var(--ok) !important; color: var(--ok) !important; background: var(--ok-tint) !important; }
+  .result { font-size: 14px; font-weight: 600; margin-top: 6px; }
+  .result.ok { color: var(--ok); } .result.bad { color: var(--bad); }
+  .result:empty { display: none; }
+  .explain-toggle { background: none; border: 0; color: var(--navy); text-decoration: underline; cursor: pointer; padding: 4px 0; font-size: 13px; }
+  .explain-text { font-size: 14px; background: var(--bg-soft); border-radius: 4px; padding: 8px 12px; margin: 4px 0 2px; }
+  .explain-text[hidden] { display: none; }
+
+  /* word list + summary */
+  .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
+  .chip {
+    width: 100%; display: flex; gap: 8px; align-items: center; text-align: left; padding: 6px 10px;
+    border: 1.5px solid var(--navy); border-radius: 6px; background: #fff; color: var(--text); cursor: grab; font-size: 14px;
+  }
+  .chip b { color: var(--navy); }
+  .chip:hover { background: var(--navy-tint); }
+  .chip.used { border-color: #b8bec8; background: #f1f2f4; color: #8a9099; }
+  .chip.used b { color: #8a9099; }
+  .chip:disabled { cursor: default; }
+  .chip.dragging { opacity: .5; }
+  .summary { font-size: 15.5px; line-height: 2.3; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
+  .summary-title { text-align: center; font-weight: 700; margin: 0 0 4px; }
+  .gap {
+    display: inline-flex; align-items: center; gap: 6px; min-width: 120px; height: 30px; padding: 0 8px; vertical-align: middle;
+    border: 1.5px dashed #8d99ad; border-radius: 4px; background: var(--bg-soft); color: var(--text); cursor: pointer; font-size: 14px;
+    scroll-margin-top: 90px;
+  }
+  .gap .gn { font-weight: 700; color: #fff; background: var(--navy); border-radius: 3px; padding: 0 6px; font-size: 12px; line-height: 18px; }
+  .gap.active { border-style: solid; border-color: #f2a900; background: #fff8e1; }
+  .gap.over { border-style: solid; border-color: var(--navy); background: var(--navy-tint); }
+  .gap.filled { border-style: solid; border-color: var(--navy); background: #fff; font-weight: 600; }
+  .gap.ok { border-color: var(--ok); background: var(--ok-tint); }
+  .gap.bad { border-color: var(--bad); background: var(--bad-tint); }
+  .gap:disabled { cursor: default; color: var(--text); }
+  .gap-result { font-size: 13px; font-weight: 700; margin-left: 4px; }
+  .gap-result.ok { color: var(--ok); } .gap-result.bad { color: var(--bad); }
+  .gap-hint { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+  .sum-explain { list-style: none; padding: 0; margin: 10px 0 0; }
+  .sum-explain li { padding: 4px 0; border-bottom: 1px solid #eef0f3; }
+  .sum-explain li[hidden] { display: none; }
+
+  /* bottom nav */
+  nav.qnav {
+    flex: none; border-top: 1px solid var(--line); background: #fff; padding: 8px 12px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center;
+  }
+  .qnav .sep { width: 10px; }
+  .qnav button {
+    width: 32px; height: 32px; border-radius: 4px; border: 1.5px solid var(--navy); background: #fff; color: var(--navy);
+    font-weight: 700; font-size: 13px; cursor: pointer; padding: 0;
+  }
+  .qnav button.answered { background: var(--navy); color: #fff; }
+  .qnav button.ok { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .qnav button.bad { background: var(--bad); border-color: var(--bad); color: #fff; }
+
+  /* ---------- Narrow screens: stack ---------- */
+  @media (max-width: 767px) {
+    body { display: block; height: auto; overflow: auto; }
+    header.topbar { position: sticky; top: 0; gap: 8px 12px; }
+    .topbar h1 { flex-basis: 100%; }
+    main.split { display: block; }
+    .panel, #passagePanel, #questionsPanel { height: auto; width: 100% !important; flex: none !important; overflow: visible; }
+    #passagePanel { padding: 18px 16px 24px; border-bottom: 4px solid var(--navy-tint); }
+    #questionsPanel { border-left: 0; }
+    .divider { display: none; }
+    .q-scroll { overflow: visible; padding: 18px 16px 24px; }
+    .people { top: calc(var(--hdr) + 4px); }
+    nav.qnav { position: sticky; bottom: 0; z-index: 10; }
+    .q, .gap { scroll-margin-top: calc(var(--hdr) + 110px); }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <h1>IELTS Academic Reading — Practice Test (Passage 1)</h1>
+  <div class="timer" role="group" aria-label="Timer">
+    <span class="timer-display" id="timerDisplay" role="timer" aria-live="off" aria-label="Time remaining">20:00</span>
+    <button class="btn" id="timerBtn" type="button" aria-pressed="false">Start</button>
+  </div>
+  <span class="counter" id="counter" aria-live="polite">Answered: 0/13</span>
+  <button class="btn solid" id="checkBtn" type="button">Check Answers</button>
+</header>
+
+<main class="split" id="split">
+  <!-- ================= PASSAGE ================= -->
+  <section class="panel" id="passagePanel" aria-label="Reading passage" tabindex="0">
+    <article class="passage" id="passage">
+      <h2>READING PASSAGE 1 — What are you laughing at?</h2>
+      <p class="instr">You should spend about 20 minutes on Questions 1–13, which are based on Reading Passage 1 below. <span class="sr">Tip: select text and press the Highlight button to highlight it.</span></p>
+      <p class="title">What are you laughing at?</p>
+      <div id="passageBody">
+        <p class="para" id="para-A" data-para="A"><b class="plabel">A</b>We like to think that laughing is the height of human sophistication. Our big brains let us see the humour in a strategically positioned pun, an unexpected plot twist or a clever piece of word play. But while joking and wit are uniquely human inventions, laughter certainly is not. Other creatures, including chimpanzees, gorillas and even rats, chuckle. Obviously, they don't crack up at Homer Simpson or titter at the boss's dreadful jokes, but the fact that they laugh in the first place suggests that sniggers and chortles have been around for a lot longer than we have. It points the way to the origins of laughter, suggesting a much more practical purpose than you might think.</p>
+
+        <p class="para" id="para-B" data-para="B"><b class="plabel">B</b>There is no doubt that laughing typically involves groups of people. 'Laughter evolved as a signal to others – it almost disappears when we are alone,' says Robert Provine, a neuroscientist at the University of Maryland. Provine found that most laughter comes as a polite reaction to everyday remarks such as 'see you later', rather than anything particularly funny. And the way we laugh depends on the company we're keeping. Men tend to laugh longer and harder when they are with other men, perhaps as a way of bonding. Women tend to laugh more and at a higher pitch when men are present, possibly indicating flirtation or even submission.</p>
+
+        <p class="para" id="para-C" data-para="C"><b class="plabel">C</b>To find the origins of laughter, Provine believes we need to look at play. He points out that the masters of laughing are children, and nowhere is their talent more obvious than in the boisterous antics <span class="missing">[MISSING TEXT]</span>, and the original context is play,' he says. Well-known primate watchers, including Dian Fossey and Jane Goodall, have long argued that chimps laugh while at play. The sound they produce is known as a pant laugh. It seems obvious when you watch their behavior – they even have the same ticklish spots as we do. But remove the context, and the parallel between human laughter and a chimp's characteristic pant laugh is not so clear. When Provine played a tape of the pant laughs to 119 of his students, for example, only two guessed correctly what it was.</p>
+
+        <p class="para" id="para-D" data-para="D"><b class="plabel">D</b>These findings underline how chimp and human laughter vary. When we laugh the sound is usually produced by chopping up a single exhalation into a series of shorter <span class="missing">[MISSING TEXT]</span> with one sound produced on each inward and outward breath. The question is: does this pant laughter have the same source as our own laughter? New research lends weight to the idea that it does. The findings come from Elke Zimmerman, head of the Institute for Zoology in Germany, who compared the sounds made by babies and chimpanzees in response to tickling during the first year of their life. Using sound spectrographs to reveal the pitch and intensity of vocalizations, she discovered that chimp and human baby laughter follow broadly the same pattern. Zimmerman believes the closeness of baby laughter to chimp laughter supports the idea that laughter was around long before humans arrived on the scene. What started simply as a modification of breathing associated with enjoyable and playful interactions has acquired a symbolic meaning as an indicator of pleasure.</p>
+
+        <p class="para" id="para-E" data-para="E"><b class="plabel">E</b>Pinpointing when laughter developed is another matter. Humans and chimps share a common ancestor that lived perhaps 8 million years ago, but animals might have been laughing long before that. More distantly related primates, including gorillas, laugh, and anecdotal evidence suggests that other social mammals may do too. Scientists are currently testing such stories with a comparative analysis of just how common laughter is among animals. So far, though, the most compelling evidence for laughter beyond primates comes from research done by Jaak Panksepp from Bowling Green State University, Ohio, into the ultrasonic chirps produced by rats during play and in response to tickling.</p>
+
+        <p class="para" id="para-F" data-para="F"><b class="plabel">F</b>All this still doesn't answer the question of why we laugh at all. One idea is that laughter and tickling originated as a way of sealing the relationship between mother and child. Another is that the reflex response to tickling is protective, alerting us to the presence of crawling creatures that might harm us or compelling us to defend the parts of our bodies that are most vulnerable in hand-to-hand combat. But the idea that has gained most popularity in recent years is that laughter in response to tickling is a way for two individuals to signal and test their trust in one another. This hypothesis starts from the observation that although a little tickle can be enjoyable, if it goes on too long it can be torture. By engaging in a bout of tickling, we put ourselves at the mercy of another individual, and laughing is a signal that we <span class="missing">[MISSING TEXT]</span> laughter is what makes it a reliable signal of trust according to Tom Flamson, a laughter researcher at the University of California, Los Angeles. 'Even in rats, laughter, tickle, play and trust are linked. Rats chirp a lot when they play,' says Flamson. 'These chirps can be aroused by tickling. And they get bonded to us as a result, which certainly seems like a show of trust.'</p>
+
+        <p class="para" id="para-G" data-para="G"><b class="plabel">G</b>We'll never know which animal laughed the first laugh, or why. But we can be sure it wasn't in response to a prehistoric joke. The funny thing is that while the origins of laughter are probably quite serious, we owe human laughter and our language-based humor to the same unique skill. While other animals pant, we alone can control our breath well enough to produce the sound of laughter. Without that control there would also be no speech – and no jokes to endure.</p>
+      </div>
+    </article>
+  </section>
+
+  <div class="divider" id="divider" role="separator" tabindex="0" aria-orientation="vertical"
+       aria-label="Resize passage and questions panels" aria-controls="passagePanel"
+       aria-valuemin="20" aria-valuemax="80" aria-valuenow="50"></div>
+
+  <!-- ================= QUESTIONS ================= -->
+  <section class="panel" id="questionsPanel" aria-label="Questions">
+    <div class="q-scroll" id="qScroll">
+      <div class="score" id="score" role="status" aria-live="polite">
+        <span>Your score: <strong id="scoreValue">0 / 13</strong></span>
+        <button type="button" class="btn-navy" id="retryBtn">Try Again</button>
+      </div>
+
+      <!-- Questions 1–6 -->
+      <section class="qgroup" aria-labelledby="g1h">
+        <h3 id="g1h">Questions 1–6</h3>
+        <div class="instr-box">
+          <p>Look at the following research findings (Questions 1–6) and the list of people below.</p>
+          <p>Match each finding with the correct person, <b>A, B, C</b> or <b>D</b>.</p>
+          <p><b>NB</b> You may use any letter more than once.</p>
+        </div>
+        <div class="people" aria-label="List of people">
+          <h4>List of people</h4>
+          <ul>
+            <li><b>A</b>Tom Flamson</li>
+            <li><b>B</b>Elke Zimmerman</li>
+            <li><b>C</b>Robert Provine</li>
+            <li><b>D</b>Jaak Panksepp</li>
+          </ul>
+        </div>
+        <div id="matchList"></div>
+      </section>
+
+      <!-- Questions 7–10 -->
+      <section class="qgroup" aria-labelledby="g2h">
+        <h3 id="g2h">Questions 7–10</h3>
+        <div class="instr-box">
+          <p>Complete the summary using the list of words, <b>A–K</b>, below.</p>
+          <p style="font-size:13px;color:var(--muted)">Drag a word into a gap, or select a gap and then a word. Select a filled gap to clear it.</p>
+        </div>
+        <ul class="chips" id="chips" aria-label="Word list"></ul>
+        <div class="summary" id="summary">
+          <p class="summary-title">The origins of laughter</p>
+          Some researchers believe that laughter first evolved out of <span data-gap="7"></span>. Investigation has revealed that human and chimp laughter may have the same <span data-gap="8"></span>. Besides, scientists have been aware that <span data-gap="9"></span> laugh, however, it now seems that laughter might be more widespread than once we thought. Although the reasons why humans started to laugh are still unknown, it seems that laughter may result from the <span data-gap="10"></span> we feel with another person.
+        </div>
+        <ul class="sum-explain" id="sumExplain" hidden></ul>
+      </section>
+
+      <!-- Questions 11–13 -->
+      <section class="qgroup" aria-labelledby="g3h">
+        <h3 id="g3h">Questions 11–13</h3>
+        <div class="instr-box">
+          <p>Do the following statements agree with the information given in Reading Passage 1? Choose:</p>
+          <dl>
+            <dt>TRUE</dt><dd>if the statement agrees with the information</dd>
+            <dt>FALSE</dt><dd>if the statement contradicts the information</dd>
+            <dt>NOT GIVEN</dt><dd>if there is no information on this</dd>
+          </dl>
+        </div>
+        <div id="tfngList"></div>
+      </section>
+    </div>
+
+    <nav class="qnav" id="qnav" aria-label="Question navigation"></nav>
+  </section>
+</main>
+
+<button type="button" class="hl-pop" id="hlPop">Highlight</button>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------- Data ---------------- */
+  var TOTAL = 13;
+  var PEOPLE = { A: 'Tom Flamson', B: 'Elke Zimmerman', C: 'Robert Provine', D: 'Jaak Panksepp' };
+  var WORDS = { A: 'evolution', B: 'chirps', C: 'origins', D: 'voice', E: 'confidence', F: 'rats',
+                G: 'primates', H: 'response', I: 'play', J: 'children', K: 'tickling' };
+  var MATCH_Q = {
+    1: 'Babies and chimps produce similar sounds of laughter.',
+    2: 'Primates are not the only animals who produce laughter.',
+    3: 'Laughter also suggests that we feel safe and easy with others.',
+    4: 'Laughter is a response to polite situation instead of humour.',
+    5: 'Animal laughter evolved before human laughter.',
+    6: 'Laughter is a social activity.'
+  };
+  var TFNG_Q = {
+    11: 'Both men and women laugh more when they are with members of the same sex.',
+    12: 'Primates lack sufficient breath control to be able to produce laughs the way humans do.',
+    13: 'Chimpanzees produce laughter in a wider range of situations than rats do.'
+  };
+  var TFNG_OPTS = ['TRUE', 'FALSE', 'NOT GIVEN'];
+  var KEY = { 1: 'B', 2: 'D', 3: 'A', 4: 'C', 5: 'B', 6: 'C', 7: 'I', 8: 'C', 9: 'G', 10: 'E',
+              11: 'FALSE', 12: 'TRUE', 13: 'NOT GIVEN' };
+  var PARAS = { 1: ['D'], 2: ['E'], 3: ['F'], 4: ['B'], 5: ['D'], 6: ['B'], 7: ['C'], 8: ['D'],
+                9: ['C', 'E'], 10: ['F'], 11: ['B'], 12: ['G'], 13: [] };
+  var EXPLAIN = {
+    1: 'Paragraph D: Elke Zimmerman found that "chimp and human baby laughter follow broadly the same pattern."',
+    2: 'Paragraph E: "the most compelling evidence for laughter beyond primates comes from research done by Jaak Panksepp… into the ultrasonic chirps produced by rats."',
+    3: 'Paragraph F: Tom Flamson says laughter is "a reliable signal of trust" – we put ourselves at the mercy of another person.',
+    4: 'Paragraph B: Robert Provine "found that most laughter comes as a polite reaction to everyday remarks… rather than anything particularly funny."',
+    5: 'Paragraph D: Zimmerman believes the similarity "supports the idea that laughter was around long before humans arrived on the scene."',
+    6: 'Paragraph B: Provine – "Laughter evolved as a signal to others – it almost disappears when we are alone."',
+    7: 'Paragraph C: Provine believes "we need to look at play" – "the original context is play."',
+    8: 'Paragraph D: "does this pant laughter have the same source as our own laughter? New research lends weight to the idea that it does." Same source = same origins.',
+    9: 'Paragraphs C and E: primate watchers "have long argued that chimps laugh"; gorillas laugh too, and "other social mammals may do too" – so laughter may be more widespread.',
+    10: 'Paragraph F: laughter is "a way for two individuals to signal and test their trust in one another" – trust = confidence.',
+    11: 'Paragraph B: men laugh more with other men, but women "laugh more… when men are present" – i.e. with the opposite sex. So the statement is FALSE.',
+    12: 'Paragraph G: "While other animals pant, we alone can control our breath well enough to produce the sound of laughter."',
+    13: 'The passage never compares the range of situations in which chimpanzees and rats laugh, so this is NOT GIVEN.'
+  };
+
+  /* ---------------- State (memory only) ---------------- */
+  var state = { answers: {}, checked: false, activeGap: null, timeLeft: 1200, timerId: null };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var live = $('live');
+  function announce(msg) { live.textContent = ''; setTimeout(function () { live.textContent = msg; }, 30); }
+  function answerLabel(q, v) {
+    if (q <= 6) return v + ' (' + PEOPLE[v] + ')';
+    if (q <= 10) return v + ' – ' + WORDS[v];
+    return v;
+  }
+
+  /* ---------------- Build: matching 1–6 ---------------- */
+  var matchList = $('matchList');
+  Object.keys(MATCH_Q).forEach(function (k) {
+    var q = +k;
+    var div = document.createElement('div');
+    div.className = 'q'; div.id = 'q' + q; div.tabIndex = -1; div.dataset.q = q;
+    var html = '<div class="q-row"><p class="q-text" id="q' + q + '-text"><span class="qn">' + q + '</span>' + MATCH_Q[q] + '</p>' +
+      '<fieldset class="opts"><legend class="sr">Question ' + q + ': choose a person</legend>';
+    ['A', 'B', 'C', 'D'].forEach(function (L) {
+      html += '<input type="radio" class="sr letter" name="q' + q + '" id="q' + q + '-' + L + '" value="' + L + '" aria-label="' + L + ', ' + PEOPLE[L] + '">' +
+              '<label for="q' + q + '-' + L + '" title="' + PEOPLE[L] + '">' + L + '</label>';
+    });
+    html += '<span class="chosen" id="q' + q + '-chosen" aria-hidden="true"></span></fieldset></div>' +
+            '<div class="result" id="q' + q + '-result"></div><div class="explain" id="q' + q + '-explain"></div>';
+    div.innerHTML = html;
+    matchList.appendChild(div);
+  });
+
+  /* ---------------- Build: TFNG 11–13 ---------------- */
+  var tfngList = $('tfngList');
+  Object.keys(TFNG_Q).forEach(function (k) {
+    var q = +k;
+    var div = document.createElement('div');
+    div.className = 'q'; div.id = 'q' + q; div.tabIndex = -1; div.dataset.q = q;
+    var html = '<p class="q-text" id="q' + q + '-text" style="margin-bottom:8px"><span class="qn">' + q + '</span>' + TFNG_Q[q] + '</p>' +
+      '<fieldset class="opts"><legend class="sr">Question ' + q + ': TRUE, FALSE or NOT GIVEN</legend>';
+    TFNG_OPTS.forEach(function (o, i) {
+      var id = 'q' + q + '-o' + i;
+      html += '<input type="radio" class="sr" name="q' + q + '" id="' + id + '" value="' + o + '">' +
+              '<label class="pill" for="' + id + '">' + o + '</label>';
+    });
+    html += '</fieldset><div class="result" id="q' + q + '-result"></div><div class="explain" id="q' + q + '-explain"></div>';
+    div.innerHTML = html;
+    tfngList.appendChild(div);
+  });
+
+  /* radio change handling (1–6, 11–13) */
+  document.querySelectorAll('.opts input[type=radio]').forEach(function (inp) {
+    inp.addEventListener('change', function () {
+      var q = +inp.name.slice(1);
+      setAnswer(q, inp.value);
+      if (q <= 6) $('q' + q + '-chosen').textContent = PEOPLE[inp.value];
+    });
+  });
+
+  /* ---------------- Build: word list + gaps 7–10 ---------------- */
+  var chipsEl = $('chips');
+  Object.keys(WORDS).forEach(function (L) {
+    var li = document.createElement('li');
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.draggable = true; b.dataset.letter = L;
+    b.setAttribute('aria-label', 'Word ' + L + ', ' + WORDS[L]);
+    b.innerHTML = '<b>' + L + '</b><span>' + WORDS[L] + '</span>';
+    li.appendChild(b); chipsEl.appendChild(li);
+
+    b.addEventListener('click', function () { if (!state.checked) placeChip(L); });
+    b.addEventListener('dragstart', function (e) {
+      if (state.checked) { e.preventDefault(); return; }
+      e.dataTransfer.setData('text/plain', L); e.dataTransfer.effectAllowed = 'copy';
+      b.classList.add('dragging');
+    });
+    b.addEventListener('dragend', function () { b.classList.remove('dragging'); });
+  });
+
+  document.querySelectorAll('[data-gap]').forEach(function (span) {
+    var q = +span.dataset.gap;
+    var g = document.createElement('button');
+    g.type = 'button'; g.className = 'gap'; g.id = 'gap' + q; g.dataset.q = q;
+    g.innerHTML = '<span class="gn">' + q + '</span><span class="gv"></span>';
+    var r = document.createElement('span'); r.className = 'gap-result'; r.id = 'gap' + q + '-result';
+    span.replaceWith(g); g.after(r);
+    updateGapLabel(q);
+
+    g.addEventListener('click', function () {
+      if (state.checked) return;
+      if (state.answers[q]) { clearGap(q); announce('Question ' + q + ' cleared.'); setActiveGap(q); return; }
+      setActiveGap(state.activeGap === q ? null : q);
+      if (state.activeGap === q) announce('Question ' + q + ' selected. Now choose a word from the list.');
+    });
+    g.addEventListener('keydown', function (e) {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && state.answers[q] && !state.checked) {
+        e.preventDefault(); clearGap(q); announce('Question ' + q + ' cleared.');
+      }
+    });
+    g.addEventListener('dragover', function (e) { if (!state.checked) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; g.classList.add('over'); } });
+    g.addEventListener('dragleave', function () { g.classList.remove('over'); });
+    g.addEventListener('drop', function (e) {
+      e.preventDefault(); g.classList.remove('over');
+      var L = e.dataTransfer.getData('text/plain');
+      if (WORDS[L] && !state.checked) { fillGap(q, L); setActiveGap(null); }
+    });
+  });
+
+  function setActiveGap(q) {
+    state.activeGap = q;
+    document.querySelectorAll('.gap').forEach(function (g) {
+      var on = +g.dataset.q === q;
+      g.classList.toggle('active', on);
+      updateGapLabel(+g.dataset.q);
+    });
+  }
+  function updateGapLabel(q) {
+    var g = $('gap' + q), v = state.answers[q];
+    var lbl = 'Question ' + q + ' gap, ' + (v ? 'filled with ' + v + ' ' + WORDS[v] + (state.checked ? '' : '. Activate to clear') : 'empty' + (state.activeGap === q ? ', selected' : '. Activate to select, then choose a word'));
+    g.setAttribute('aria-label', lbl);
+  }
+  function fillGap(q, L) {
+    var g = $('gap' + q);
+    g.querySelector('.gv').textContent = L + ' – ' + WORDS[L];
+    g.classList.add('filled');
+    setAnswer(q, L);
+    updateGapLabel(q); refreshChips();
+    announce('Question ' + q + ': ' + L + ', ' + WORDS[L] + '.');
+  }
+  function clearGap(q) {
+    var g = $('gap' + q);
+    g.querySelector('.gv').textContent = '';
+    g.classList.remove('filled');
+    setAnswer(q, null);
+    updateGapLabel(q); refreshChips();
+  }
+  function placeChip(L) {
+    var target = state.activeGap;
+    if (!target) {
+      for (var q = 7; q <= 10; q++) if (!state.answers[q]) { target = q; break; }
+    }
+    if (!target) { announce('All gaps are filled. Select a gap to clear it first.'); return; }
+    fillGap(target, L);
+    setActiveGap(null);
+  }
+  function refreshChips() {
+    var used = {};
+    for (var q = 7; q <= 10; q++) if (state.answers[q]) used[state.answers[q]] = true;
+    document.querySelectorAll('.chip').forEach(function (c) {
+      var u = !!used[c.dataset.letter];
+      c.classList.toggle('used', u);
+      c.setAttribute('aria-label', 'Word ' + c.dataset.letter + ', ' + WORDS[c.dataset.letter] + (u ? ', already used' : ''));
+    });
+  }
+
+  /* ---------------- Navigation ---------------- */
+  var nav = $('qnav');
+  for (var n = 1; n <= TOTAL; n++) {
+    if (n === 7 || n === 11) { var s = document.createElement('span'); s.className = 'sep'; s.setAttribute('aria-hidden', 'true'); nav.appendChild(s); }
+    (function (q) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = q; b.id = 'nav' + q;
+      b.addEventListener('click', function () { goTo(q); });
+      nav.appendChild(b);
+    })(n);
+  }
+  function goTo(q) {
+    var el = (q >= 7 && q <= 10) ? $('gap' + q) : $('q' + q);
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.focus({ preventScroll: true });
+    var block = (q >= 7 && q <= 10) ? $('summary') : el;
+    block.classList.remove('target'); void block.offsetWidth; block.classList.add('target');
+  }
+
+  /* ---------------- Answers & counter ---------------- */
+  function setAnswer(q, v) {
+    if (v == null) delete state.answers[q]; else state.answers[q] = v;
+    updateCounts();
+  }
+  function updateCounts() {
+    var c = Object.keys(state.answers).length;
+    $('counter').textContent = 'Answered: ' + c + '/' + TOTAL;
+    for (var q = 1; q <= TOTAL; q++) {
+      var b = $('nav' + q), a = !!state.answers[q];
+      b.classList.toggle('answered', a);
+      var status = a ? 'answered' : 'unanswered';
+      if (state.checked) status = isCorrect(q) ? 'correct' : 'incorrect';
+      b.setAttribute('aria-label', 'Question ' + q + ', ' + status);
+    }
+  }
+  function isCorrect(q) { return state.answers[q] === KEY[q]; }
+
+  /* ---------------- Timer ---------------- */
+  var timerBtn = $('timerBtn'), timerDisplay = $('timerDisplay');
+  function renderTimer() {
+    var m = Math.floor(state.timeLeft / 60), s = state.timeLeft % 60;
+    timerDisplay.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    timerDisplay.classList.toggle('low', state.timeLeft < 120);
+    timerDisplay.setAttribute('aria-label', 'Time remaining ' + m + ' minutes ' + s + ' seconds');
+  }
+  function startTimer() {
+    if (state.timerId || state.timeLeft <= 0 || state.checked) return;
+    state.timerId = setInterval(function () {
+      state.timeLeft--;
+      renderTimer();
+      if (state.timeLeft === 120) announce('Two minutes remaining.');
+      if (state.timeLeft <= 0) { pauseTimer(); timerBtn.disabled = true; announce("Time is up."); }
+    }, 1000);
+    timerBtn.textContent = 'Pause'; timerBtn.setAttribute('aria-pressed', 'true');
+  }
+  function pauseTimer() {
+    clearInterval(state.timerId); state.timerId = null;
+    timerBtn.textContent = 'Start'; timerBtn.setAttribute('aria-pressed', 'false');
+  }
+  timerBtn.addEventListener('click', function () { state.timerId ? pauseTimer() : startTimer(); });
+
+  /* ---------------- Check answers ---------------- */
+  $('checkBtn').addEventListener('click', function () {
+    if (state.checked) return;
+    var c = Object.keys(state.answers).length;
+    var msg = 'Check your answers now? You will not be able to change them afterwards.';
+    if (c < TOTAL) msg = 'You have answered ' + c + ' of ' + TOTAL + ' questions. ' + msg;
+    if (!window.confirm(msg)) return;
+    checkAnswers();
+  });
+
+  function checkAnswers() {
+    state.checked = true;
+    pauseTimer(); timerBtn.disabled = true;
+    $('checkBtn').disabled = true;
+    setActiveGap(null);
+    hidePop();
+
+    document.querySelectorAll('.opts input, .chip, .gap').forEach(function (el) { el.disabled = true; });
+    document.querySelectorAll('.chip').forEach(function (c) { c.draggable = false; });
+
+    var score = 0;
+    var sumList = $('sumExplain'); sumList.innerHTML = ''; sumList.hidden = false;
+
+    for (var q = 1; q <= TOTAL; q++) {
+      var ok = isCorrect(q), given = state.answers[q];
+      if (ok) score++;
+      $('nav' + q).classList.add(ok ? 'ok' : 'bad');
+
+      if (q >= 7 && q <= 10) {
+        var g = $('gap' + q), r = $('gap' + q + '-result');
+        g.classList.add(ok ? 'ok' : 'bad');
+        r.className = 'gap-result ' + (ok ? 'ok' : 'bad');
+        r.textContent = ok ? '✓' : '✗ ' + answerLabel(q, KEY[q]);
+        r.setAttribute('aria-label', ok ? 'Correct' : 'Incorrect. Correct answer: ' + answerLabel(q, KEY[q]));
+        updateGapLabel(q);
+        var li = document.createElement('li');
+        li.innerHTML = '<span class="qn">' + q + '</span>';
+        li.appendChild(makeExplain(q));
+        sumList.appendChild(li);
+      } else {
+        document.querySelectorAll('input[name="q' + q + '"]').forEach(function (inp) {
+          var lab = document.querySelector('label[for="' + inp.id + '"]');
+          if (inp.checked) lab.classList.add(ok ? 'ok' : 'bad');
+          else if (!ok && inp.value === KEY[q]) lab.classList.add('key');
+        });
+        var res = $('q' + q + '-result');
+        res.className = 'result ' + (ok ? 'ok' : 'bad');
+        res.textContent = ok ? '✓ Correct' : '✗ ' + (given ? 'Incorrect' : 'Not answered') + ' — correct answer: ' + answerLabel(q, KEY[q]);
+        $('q' + q + '-explain').appendChild(makeExplain(q));
+      }
+    }
+    updateCounts();
+    $('scoreValue').textContent = score + ' / ' + TOTAL;
+    $('score').classList.add('show');
+    $('qScroll').scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.matchMedia('(max-width: 767px)').matches) $('score').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    announce('Answers checked. Your score is ' + score + ' out of ' + TOTAL + '.');
+  }
+
+  function makeExplain(q) {
+    var wrap = document.createElement('div');
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'explain-toggle';
+    btn.textContent = 'Show explanation';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', 'exp' + q);
+    btn.setAttribute('aria-label', 'Show explanation for question ' + q);
+    var p = document.createElement('div');
+    p.className = 'explain-text'; p.id = 'exp' + q; p.hidden = true; p.textContent = EXPLAIN[q];
+    btn.addEventListener('click', function () {
+      var open = btn.getAttribute('aria-expanded') !== 'true';
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Hide explanation' : 'Show explanation';
+      btn.setAttribute('aria-label', (open ? 'Hide' : 'Show') + ' explanation for question ' + q);
+      p.hidden = !open;
+      if (open && PARAS[q].length) showParas(PARAS[q]);
+    });
+    wrap.appendChild(btn); wrap.appendChild(p);
+    return wrap;
+  }
+  function showParas(list) {
+    var first = $('para-' + list[0]);
+    if (!window.matchMedia('(max-width: 767px)').matches) {
+      var panel = $('passagePanel');
+      var top = first.getBoundingClientRect().top - panel.getBoundingClientRect().top + panel.scrollTop - 24;
+      panel.scrollTo({ top: top, behavior: 'smooth' });
+    } else {
+      first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    list.forEach(function (L) {
+      var p = $('para-' + L);
+      p.classList.remove('flash'); void p.offsetWidth; p.classList.add('flash');
+    });
+  }
+
+  /* ---------------- Try again ---------------- */
+  $('retryBtn').addEventListener('click', function () {
+    state.answers = {}; state.checked = false; state.activeGap = null;
+    pauseTimer(); state.timeLeft = 1200; renderTimer(); timerBtn.disabled = false;
+    $('checkBtn').disabled = false;
+
+    document.querySelectorAll('.opts input').forEach(function (inp) { inp.checked = false; inp.disabled = false; });
+    document.querySelectorAll('.opts label').forEach(function (l) { l.classList.remove('ok', 'bad', 'key'); });
+    document.querySelectorAll('.chosen, .result, .gap-result, .explain').forEach(function (el) { el.textContent = ''; el.className = el.className.replace(/\b(ok|bad)\b/g, '').trim(); el.removeAttribute('aria-label'); });
+    document.querySelectorAll('.chip').forEach(function (c) { c.disabled = false; c.draggable = true; });
+    for (var q = 7; q <= 10; q++) {
+      var g = $('gap' + q); g.disabled = false; g.classList.remove('ok', 'bad', 'filled', 'active');
+      g.querySelector('.gv').textContent = ''; updateGapLabel(q);
+    }
+    $('sumExplain').innerHTML = ''; $('sumExplain').hidden = true;
+    document.querySelectorAll('.qnav button').forEach(function (b) { b.classList.remove('ok', 'bad'); });
+    $('score').classList.remove('show');
+    clearHighlights();
+    refreshChips(); updateCounts();
+    $('qScroll').scrollTo({ top: 0 }); $('passagePanel').scrollTo({ top: 0 });
+    if (window.matchMedia('(max-width: 767px)').matches) window.scrollTo({ top: 0 });
+    timerBtn.focus();
+    announce('Test reset. All answers cleared and timer reset to 20 minutes.');
+  });
+
+  /* ---------------- Highlighting ---------------- */
+  var passageBody = $('passageBody'), pop = $('hlPop'), savedRange = null;
+
+  function hidePop() { pop.style.display = 'none'; savedRange = null; }
+  function maybeShowPop() {
+    var sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) { if (document.activeElement !== pop) hidePop(); return; }
+    var range = sel.getRangeAt(0);
+    if (!passageBody.contains(range.commonAncestorContainer)) { hidePop(); return; }
+    if (!range.toString().trim()) { hidePop(); return; }
+    savedRange = range.cloneRange();
+    var rects = range.getClientRects();
+    var r = rects.length ? rects[rects.length - 1] : range.getBoundingClientRect();
+    pop.style.display = 'block';
+    var x = Math.min(r.right + 6, window.innerWidth - pop.offsetWidth - 8);
+    var y = r.bottom + 6;
+    if (y + pop.offsetHeight > window.innerHeight - 8) y = r.top - pop.offsetHeight - 6;
+    pop.style.left = Math.max(8, x) + 'px';
+    pop.style.top = Math.max(8, y) + 'px';
+  }
+  passageBody.addEventListener('mouseup', function () { setTimeout(maybeShowPop, 0); });
+  passageBody.addEventListener('touchend', function () { setTimeout(maybeShowPop, 50); });
+  document.addEventListener('keyup', function (e) { if (e.shiftKey || e.key === 'Shift') setTimeout(maybeShowPop, 0); });
+  document.addEventListener('mousedown', function (e) { if (e.target !== pop && !passageBody.contains(e.target)) hidePop(); });
+  $('passagePanel').addEventListener('scroll', hidePop);
+  window.addEventListener('scroll', hidePop);
+  pop.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  pop.addEventListener('keydown', function (e) { if (e.key === 'Escape') hidePop(); });
+  pop.addEventListener('click', function () {
+    if (!savedRange) return;
+    highlightRange(savedRange);
+    window.getSelection().removeAllRanges();
+    hidePop();
+    announce('Text highlighted.');
+  });
+
+  function highlightRange(range) {
+    var root = range.commonAncestorContainer;
+    if (root.nodeType === 3) root = root.parentNode;
+    var nodes = [];
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        if (!range.intersectsNode(n) || !n.nodeValue.length) return NodeFilter.FILTER_REJECT;
+        if (!passageBody.contains(n)) return NodeFilter.FILTER_REJECT;
+        if (n.parentNode.closest('mark.hl, .plabel')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function (n) {
+      var start = n === range.startContainer ? range.startOffset : 0;
+      var end = n === range.endContainer ? range.endOffset : n.length;
+      if (start >= end) return;
+      if (end < n.length) n.splitText(end);
+      var target = start > 0 ? n.splitText(start) : n;
+      if (!target.nodeValue.trim()) return;
+      var m = document.createElement('mark');
+      m.className = 'hl'; m.tabIndex = 0;
+      m.setAttribute('role', 'button');
+      m.setAttribute('aria-label', 'Highlighted: ' + target.nodeValue.trim().slice(0, 60) + '. Activate to remove highlight');
+      target.parentNode.insertBefore(m, target);
+      m.appendChild(target);
+    });
+  }
+  function removeMark(m) {
+    var parent = m.parentNode;
+    while (m.firstChild) parent.insertBefore(m.firstChild, m);
+    parent.removeChild(m); parent.normalize();
+  }
+  function clearHighlights() { passageBody.querySelectorAll('mark.hl').forEach(removeMark); }
+  passageBody.addEventListener('click', function (e) {
+    var m = e.target.closest('mark.hl');
+    if (!m) return;
+    var sel = window.getSelection();
+    if (sel && !sel.isCollapsed) return; // user is selecting, not removing
+    removeMark(m); announce('Highlight removed.');
+  });
+  passageBody.addEventListener('keydown', function (e) {
+    var m = e.target.closest && e.target.closest('mark.hl');
+    if (m && (e.key === 'Enter' || e.key === ' ' || e.key === 'Delete')) { e.preventDefault(); removeMark(m); announce('Highlight removed.'); }
+  });
+
+  /* ---------------- Resizable divider ---------------- */
+  var divider = $('divider'), split = $('split'), passagePanel = $('passagePanel');
+  function setSplit(pct) {
+    pct = Math.max(20, Math.min(80, pct));
+    passagePanel.style.flexBasis = pct + '%';
+    divider.setAttribute('aria-valuenow', Math.round(pct));
+    divider.setAttribute('aria-valuetext', 'Passage ' + Math.round(pct) + '% wide');
+  }
+  var dragging = false;
+  divider.addEventListener('pointerdown', function (e) {
+    dragging = true; divider.setPointerCapture(e.pointerId);
+    divider.classList.add('dragging'); document.body.classList.add('resizing'); hidePop();
+  });
+  divider.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var r = split.getBoundingClientRect();
+    setSplit((e.clientX - r.left) / r.width * 100);
+  });
+  function endDrag() { dragging = false; divider.classList.remove('dragging'); document.body.classList.remove('resizing'); }
+  divider.addEventListener('pointerup', endDrag);
+  divider.addEventListener('pointercancel', endDrag);
+  divider.addEventListener('keydown', function (e) {
+    var cur = +divider.getAttribute('aria-valuenow');
+    if (e.key === 'ArrowLeft') { e.preventDefault(); setSplit(cur - 2); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); setSplit(cur + 2); }
+    else if (e.key === 'Home') { e.preventDefault(); setSplit(20); }
+    else if (e.key === 'End') { e.preventDefault(); setSplit(80); }
+    else if (e.key === 'Enter') { e.preventDefault(); setSplit(50); }
+  });
+  divider.addEventListener('dblclick', function () { setSplit(50); });
+
+  /* header height for sticky offsets on narrow screens */
+  function setHdr() { document.documentElement.style.setProperty('--hdr', $('topbar').offsetHeight + 'px'); }
+  window.addEventListener('resize', function () { setHdr(); hidePop(); });
+
+  /* init */
+  setSplit(50); renderTimer(); refreshChips(); updateCounts(); setHdr();
+})();
+</script>
+</body>
+</html>
